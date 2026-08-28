@@ -1077,7 +1077,7 @@
 
   <div class="contador" id="contador"></div>
   <div class="grid" id="grid"></div>
-  <div class="vacio" id="vacio" style="display:none;">Todavía no hay zapatos registrados en este armario.</div>
+  <div class="vacio" id="vacio" style="display:none;">Todavía no hay elementos registrados en este armario.</div>
 
 </main>
 
@@ -1454,7 +1454,7 @@
     form.reset();
     fotoBase64 = null;
     previewRow.style.display = 'none';
-    tituloPanel.textContent = 'Añadir zapato';
+    tituloPanel.textContent = 'Añadir elemento';
     btnGuardar.textContent = 'Guardar';
     pintarPaletaColores();
     pintarTagsActuales();
@@ -1480,7 +1480,7 @@
       previewTexto.textContent = 'Sin foto todavía · súbela cuando la tengas a mano';
     }
     previewRow.style.display = 'flex';
-    tituloPanel.textContent = 'Editar zapato';
+    tituloPanel.textContent = 'Editar elemento';
     btnGuardar.textContent = 'Guardar cambios';
     pintarPaletaColores();
     pintarTagsActuales();
@@ -1525,7 +1525,7 @@
           estado: 'guardado',
           fecha: new Date().toISOString()
         });
-        mostrarToast(fotoBase64 ? 'Zapato guardado' : 'Zapato guardado sin foto');
+        mostrarToast(fotoBase64 ? 'Elemento guardado' : 'Elemento guardado sin foto');
       }
       entrarModoAlta();
       panelAlta.classList.remove('activo');
@@ -1602,7 +1602,7 @@
   btnEliminarSeleccion.addEventListener('click', async () => {
     if(seleccionados.size === 0) return;
     const n = seleccionados.size;
-    const confirmado = confirm(`¿Eliminar ${n} zapato(s) seleccionados? Esta acción no se puede deshacer.`);
+    const confirmado = confirm(`¿Eliminar ${n} elemento(s) seleccionados? Esta acción no se puede deshacer.`);
     if(!confirmado) return;
     try{
       for(const id of seleccionados){
@@ -1706,7 +1706,7 @@
     pintarPaletaColoresMasivo();
     pintarTagsMasivo();
     pintarSugerenciasTagsMasivo();
-    subtituloMasivo.textContent = seleccionados.size + (seleccionados.size === 1 ? ' zapato se verá afectado' : ' zapatos se verán afectados');
+    subtituloMasivo.textContent = seleccionados.size + (seleccionados.size === 1 ? ' elemento se verá afectado' : ' zapatos se verán afectados');
     panelMasivo.classList.add('activo');
     panelMasivo.scrollIntoView({ behavior:'smooth', block:'start' });
   }
