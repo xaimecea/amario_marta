@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zapateiro</title>
+
+<!-- PWA Manifest & iOS Meta Tags -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zapateiro">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<style>
+  :root{
+    --bg:#ffffff;
+    --superficie:#fafafa;
+    --linea:#e8e8e8;
+    --texto:#111111;
+    --texto-suave:#8a8a8a;
+    --acento:#111111;
+    --acento-hover:#000000;
+    --peligro:#b3261e;
+    --fuera:#b9770e;
+    --fuera-bg:#fdf3e3;
+    --tag-bg:#f0f0f0;
+    --tag-txt:#333333;
+    --tag-activo-bg:#111111;
+    --tag-activo-txt:#ffffff;
+    --radio:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--texto);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  header{
+    padding:24px 16px 14px;
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .cabecera-grid{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:12px;
+  }
+  .cabecera-centro{
+    text-align:center;
+  }
+  header h1{
+    font-size:1.3rem;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+  }
+  .cabecera-derecha{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:6px;
+  }
+
+  /* Selector de Armario / Toggle */
+  .selector-armario{
+    display:flex;
+    justify-content:center;
+  }
+  .toggle-contenedor{
+    display:inline-flex;
+    background:var(--superficie);
+    border:1px solid var(--linea);
+    border-radius:30px;
+    padding:3px;
+    gap:3px;
+  }
+  .btn-armario{
+    border:none;
+    background:transparent;
+    padding:5px 14px;
+    border-radius:20px;
+    font-size:0.78rem;
+    font-weight:600;
+    color:var(--texto-suave);
+    cursor:pointer;
+    transition:all 0.15s ease;
+  }
+  .btn-armario:hover{
+    color:var(--texto);
+  }
+  .btn-armario.activo{
+    background:var(--acento);
+    color:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,0.12);
+  }
+
+  /* Botones Redondos de Cabecera */
+  .btn-redondo{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    font-size:1.1rem;
+    line-height:1;
+  }
+
+  main{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 16px 60px;
+  }
+
+  /* Panel de alta / edición */
+  .panel-formulario{
+    display:none;
+    border:1px solid var(--linea);
+    border-radius:var(--radio);
+    margin-bottom:20px;
+    background:var(--superficie);
+    padding:16px;
+  }
+  .panel-formulario.activo{
+    display:block;
+  }
+  .panel-formulario h3{
+    margin:0 0 14px;
+    font-size:0.95rem;
+    font-weight:600;
+  }
+
+  /* Barra de búsqueda / acciones */
+  .barra{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    padding:12px 0 10px;
+    border-bottom:1px solid var(--linea);
+    margin-bottom:10px;
+  }
+  .buscador{
+    flex:1;
+    min-width:150px;
+  }
+  .buscador input{
+    width:100%;
+    padding:8px 12px;
+    border:1px solid var(--linea);
+    border-radius:8px;
+    font-size:0.85rem;
+    background:var(--superficie);
+    color:var(--texto);
+  }
+  .buscador input:focus{
+    outline:2px solid var(--texto);
+    outline-offset:1px;
+    background:#fff;
+  }
+  select{
+    font-family:inherit;
+    font-size:0.78rem;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid var(--linea);
+    background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%238a8a8a"/></svg>') no-repeat right 10px center;
+    color:var(--texto);
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    padding-right:26px;
+  }
+  select:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+  }
+  select:focus-visible{
+    outline:2px solid var(--texto);
+    outline-offset:1px;
+  }
+  .acciones{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  button, .btn{
+    font-family:inherit;
+    font-size:0.78rem;
+    padding:8px 14px;
+    border-radius:8px;
+    border:1px solid var(--linea);
+    background:#fff;
+    color:var(--texto);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  button:hover, .btn:hover{
+    background:var(--superficie);
+    border-color:#d5d5d5;
+  }
+  button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visible{
+    outline:2px solid var(--texto);
+    outline-offset:1px;
+  }
+  .btn-primario{
+    background:var(--acento);
+    color:#fff;
+    border-color:var(--acento);
+  }
+  .btn-primario:hover{
+    background:var(--acento-hover);
+  }
+  .btn-primario:disabled{
+    opacity:0.35;
+    cursor:not-allowed;
+  }
+  .btn-texto{
+    border-color:transparent;
+    background:transparent;
+    color:var(--texto-suave);
+  }
+  .btn-texto:hover{
+    background:var(--superficie);
+    color:var(--texto);
+  }
+  .btn-peligro{
+    background:#fff;
+    color:var(--peligro);
+    border-color:var(--peligro);
+  }
+  .btn-peligro:hover{
+    background:#fbeceb;
+  }
+
+  /* Barra de filtros desplegable */
+  .barra-filtros{
+    display:none;
+    flex-wrap:wrap;
+    gap:6px;
+    align-items:center;
+    padding:10px 12px;
+    background:var(--superficie);
+    border:1px solid var(--linea);
+    border-radius:8px;
+    margin-bottom:14px;
+  }
+  .barra-filtros.activo{
+    display:flex;
+  }
+  .barra-filtros .etiqueta-filtro{
+    font-size:0.72rem;
+    font-weight:600;
+    color:var(--texto);
+    margin-right:2px;
+  }
+  .btn-icono-ajustes{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:8px 10px;
+  }
+  .btn-icono-ajustes.activo{
+    background:var(--texto);
+    color:#fff;
+    border-color:var(--texto);
+  }
+
+  /* Resumen de estados */
+  .resumen{
+    font-size:0.74rem;
+    color:var(--texto-suave);
+    margin-bottom:14px;
+  }
+  .resumen strong{
+    color:var(--fuera);
+    font-weight:600;
+  }
+
+  /* Barra de selección múltiple */
+  .barra-seleccion{
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:var(--texto);
+    color:#fff;
+    padding:8px 14px;
+    border-radius:8px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .barra-seleccion.activa{
+    display:flex;
+  }
+  .barra-seleccion span{
+    font-size:0.78rem;
+  }
+  .barra-seleccion .grupo-botones{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .barra-seleccion button{
+    border-color:rgba(255,255,255,0.3);
+    background:transparent;
+    color:#fff;
+    padding:6px 10px;
+    font-size:0.74rem;
+  }
+  .barra-seleccion button:hover{
+    background:rgba(255,255,255,0.12);
+  }
+  .barra-seleccion .btn-eliminar-sel{
+    background:#fff;
+    color:var(--peligro);
+    border-color:#fff;
+  }
+  .barra-seleccion .btn-eliminar-sel:hover{
+    background:#f3e2e1;
+  }
+  .barra-seleccion .btn-editar-sel{
+    background:#fff;
+    color:var(--texto);
+    border-color:#fff;
+  }
+  .barra-seleccion .btn-editar-sel:hover{
+    background:var(--superficie);
+  }
+
+  /* Panel de edición masiva */
+  .panel-masivo{
+    display:none;
+    border:1px solid var(--linea);
+    border-radius:var(--radio);
+    background:var(--superficie);
+    padding:16px;
+    margin-bottom:18px;
+  }
+  .panel-masivo.activo{
+    display:block;
+  }
+  .panel-masivo h3{
+    font-size:0.9rem;
+    margin:0 0 4px;
+  }
+  .panel-masivo .subtitulo{
+    font-size:0.74rem;
+    color:var(--texto-suave);
+    margin:0 0 14px;
+  }
+  .campo-masivo{
+    margin-bottom:14px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--linea);
+  }
+  .campo-masivo:last-of-type{
+    border-bottom:none;
+    margin-bottom:0;
+    padding-bottom:0;
+  }
+  .campo-masivo > label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:0.8rem;
+    color:var(--texto);
+    margin-bottom:8px;
+    cursor:pointer;
+  }
+  .campo-masivo > label input[type="checkbox"]{
+    width:15px;
+    height:15px;
+    cursor:pointer;
+  }
+  .contenido-campo-masivo{
+    opacity:0.4;
+    pointer-events:none;
+    transition:opacity 0.12s ease;
+  }
+  .contenido-campo-masivo.activo{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .campo-masivo input[type="text"]{
+    max-width:320px;
+  }
+
+  .fila-opciones-importacion{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:12px;
+  }
+  .btn-mini{
+    font-size:0.72rem;
+    padding:5px 10px;
+  }
+  .lista-importacion{
+    max-height:300px;
+    overflow-y:auto;
+    border:1px solid var(--linea);
+    border-radius:8px;
+    background:#fff;
+  }
+  .fila-importacion{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 10px;
+    border-bottom:1px solid var(--linea);
+  }
+  .fila-importacion:last-child{
+    border-bottom:none;
+  }
+  .fila-importacion input[type="checkbox"]{
+    width:16px;
+    height:16px;
+    flex-shrink:0;
+    cursor:pointer;
+  }
+  .fila-importacion .info-fila{
+    flex:1;
+    min-width:0;
+  }
+  .fila-importacion .nombre-fila{
+    font-size:0.8rem;
+    font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .fila-importacion .detalle-fila{
+    font-size:0.72rem;
+    color:var(--texto-suave);
+  }
+  .badge-import{
+    flex-shrink:0;
+    font-size:0.64rem;
+    font-weight:600;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+    padding:2px 6px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .badge-import.nuevo{
+    color:#1a7a44;
+    background:#e6f4ec;
+  }
+  .badge-import.existente{
+    color:var(--fuera);
+    background:var(--fuera-bg);
+  }
+  .fila-importacion.desactivada{
+    opacity:0.45;
+  }
+
+  .campos-principales{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 140px;
+    gap:12px;
+    align-items:end;
+  }
+  @media (max-width:760px){
+    .cabecera-grid{
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    .cabecera-derecha{
+      justify-content:center;
+    }
+    .campos-principales{grid-template-columns: 1fr 1fr;}
+  }
+  @media (max-width:480px){
+    .campos-principales{grid-template-columns: 1fr;}
+  }
+  label{
+    display:block;
+    font-size:0.7rem;
+    color:var(--texto-suave);
+    margin-bottom:4px;
+  }
+  input[type="text"], input[type="file"]{
+    width:100%;
+    padding:8px 10px;
+    border:1px solid var(--linea);
+    border-radius:8px;
+    font-family:inherit;
+    font-size:0.84rem;
+    background:#fff;
+  }
+  input[type="file"]{
+    padding:6px;
+    font-size:0.74rem;
+  }
+  .preview-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:14px;
+  }
+  .preview-row img{
+    width:48px;
+    height:48px;
+    object-fit:cover;
+    border-radius:8px;
+    border:1px solid var(--linea);
+  }
+  .preview-row span{
+    font-size:0.74rem;
+    color:var(--texto-suave);
+  }
+
+  /* Selector de color estandarizado */
+  .bloque-campo{
+    margin-top:14px;
+  }
+  .paleta-colores{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .swatch{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    padding:5px 8px 5px 5px;
+    border:1px solid var(--linea);
+    border-radius:20px;
+    background:#fff;
+    font-size:0.74rem;
+    color:var(--texto);
+    cursor:pointer;
+  }
+  .swatch .punto{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    border:1px solid rgba(0,0,0,0.15);
+    flex-shrink:0;
+  }
+  .swatch.seleccionado{
+    border-color:var(--texto);
+    background:#fff;
+    box-shadow:0 0 0 1px var(--texto);
+  }
+  .swatch.multicolor .punto{
+    background:conic-gradient(red,orange,yellow,green,blue,violet,red);
+  }
+
+  /* Etiquetas de estilo (tags) */
+  .tags-actuales{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    min-height:28px;
+    margin-bottom:6px;
+  }
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    background:var(--tag-activo-bg);
+    color:var(--tag-activo-txt);
+    border-radius:20px;
+    padding:4px 6px 4px 10px;
+    font-size:0.74rem;
+  }
+  .tag button{
+    border:none;
+    background:transparent;
+    color:inherit;
+    padding:0;
+    width:14px;
+    height:14px;
+    line-height:1;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.85rem;
+  }
+  .tag button:hover{
+    background:rgba(255,255,255,0.2);
+  }
+  .fila-tag-input{
+    display:flex;
+    gap:6px;
+  }
+  .fila-tag-input input{
+    flex:1;
+    max-width:none !important;
+  }
+  .sugerencias-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:6px;
+  }
+  .chip-sugerida{
+    font-size:0.72rem;
+    padding:4px 10px;
+    border-radius:20px;
+    border:1px dashed var(--linea);
+    background:#fff;
+    color:var(--texto-suave);
+    cursor:pointer;
+  }
+  .chip-sugerida:hover{
+    border-color:var(--texto);
+    color:var(--texto);
+  }
+
+  .form-acciones{
+    display:flex;
+    justify-content:flex-end;
+    gap:6px;
+    margin-top:16px;
+  }
+
+  /* Contador */
+  .contador{
+    font-size:0.75rem;
+    color:var(--texto-suave);
+    margin-bottom:12px;
+  }
+
+  /* Galería Móvil en 2 columnas, Escritorio 4+ */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (min-width: 600px) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+  }
+  @media (min-width: 850px) {
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+    }
+  }
+
+  .tarjeta{
+    position:relative;
+  }
+  .tarjeta .foto-wrap{
+    aspect-ratio:1/1;
+    border-radius:var(--radio);
+    overflow:hidden;
+    background:var(--superficie);
+    border:1px solid var(--linea);
+  }
+  .tarjeta.fuera .foto-wrap{
+    border-color:var(--fuera);
+    border-width:1.5px;
+  }
+  .placeholder-foto{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--texto-suave);
+    font-size:0.74rem;
+    background:repeating-linear-gradient(45deg, var(--superficie), var(--superficie) 10px, #f2f2f2 10px, #f2f2f2 20px);
+  }
+  .etiqueta-sinfoto{
+    flex-shrink:0;
+    font-size:0.58rem;
+    font-weight:600;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+    color:var(--texto-suave);
+    background:var(--superficie);
+    border:1px dashed var(--linea);
+    border-radius:4px;
+    padding:1px 4px;
+  }
+  .tarjeta img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .tarjeta .info{
+    padding:8px 1px 0;
+  }
+  .tarjeta .fila-nombre{
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .tarjeta .nombre{
+    font-size:0.84rem;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .tarjeta .marca{
+    font-size:0.7rem;
+    color:var(--texto-suave);
+    margin-top:1px;
+  }
+  .tarjeta .caja{
+    font-size:0.72rem;
+    color:var(--texto-suave);
+    margin-top:2px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .tarjeta .caja .punto-color{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    border:1px solid rgba(0,0,0,0.15);
+    flex-shrink:0;
+  }
+  .tarjeta .caja .punto-color.multicolor{
+    background:conic-gradient(red,orange,yellow,green,blue,violet,red);
+  }
+  .tarjeta .lista-etiquetas{
+    display:flex;
+    flex-wrap:wrap;
+    gap:3px;
+    margin-top:4px;
+  }
+  .etiqueta-mini{
+    font-size:0.62rem;
+    padding:1px 6px;
+    border-radius:12px;
+    background:var(--tag-bg);
+    color:var(--tag-txt);
+  }
+  .etiqueta-fuera{
+    flex-shrink:0;
+    font-size:0.58rem;
+    font-weight:600;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+    color:var(--fuera);
+    background:var(--fuera-bg);
+    border-radius:4px;
+    padding:1px 4px;
+  }
+  .btn-estado{
+    margin-top:6px;
+    width:100%;
+    font-size:0.72rem;
+    padding:5px 8px;
+    border-radius:6px;
+  }
+  .btn-estado.accion-sacar{
+    color:var(--texto);
+    border-color:var(--linea);
+  }
+  .btn-estado.accion-guardar{
+    color:var(--fuera);
+    border-color:var(--fuera);
+    background:var(--fuera-bg);
+  }
+  .btn-estado.accion-guardar:hover{
+    background:#fbe8c8;
+  }
+  .tarjeta .acciones-tarjeta{
+    position:absolute;
+    top:6px;
+    left:6px;
+    right:6px;
+    display:flex;
+    justify-content:space-between;
+    opacity:0;
+    transition:opacity 0.12s ease;
+  }
+  .tarjeta:hover .acciones-tarjeta,
+  .tarjeta .acciones-tarjeta:focus-within{
+    opacity:1;
+  }
+  .btn-icono{
+    width:24px;
+    height:24px;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.92);
+    border:1px solid var(--linea);
+    border-radius:50%;
+    font-size:0.75rem;
+    backdrop-filter:blur(2px);
+  }
+  .btn-icono.editar:hover{
+    color:var(--texto);
+    border-color:var(--texto);
+  }
+  .btn-icono.borrar:hover{
+    color:var(--peligro);
+    border-color:var(--peligro);
+  }
+
+  /* Modo selección múltiple */
+  .grid.modo-seleccion .acciones-tarjeta,
+  .grid.modo-seleccion .btn-estado{
+    display:none;
+  }
+  .grid.modo-seleccion .tarjeta{
+    cursor:pointer;
+  }
+  .grid.modo-seleccion .foto-wrap{
+    transition:outline 0.1s ease;
+  }
+  .checkbox-seleccion{
+    display:none;
+    position:absolute;
+    top:6px;
+    left:6px;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    border:2px solid #fff;
+    background:rgba(17,17,17,0.55);
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:0.75rem;
+    font-weight:bold;
+    z-index:2;
+  }
+  .grid.modo-seleccion .checkbox-seleccion{
+    display:flex;
+  }
+  .tarjeta.seleccionada .checkbox-seleccion{
+    background:var(--acento);
+    border-color:var(--acento);
+  }
+  .tarjeta.seleccionada .foto-wrap{
+    outline:3px solid var(--acento);
+    outline-offset:2px;
+  }
+
+  .vacio{
+    text-align:center;
+    padding:60px 16px;
+    color:var(--texto-suave);
+    font-size:0.84rem;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%) translateY(12px);
+    background:var(--texto);
+    color:#fff;
+    padding:8px 16px;
+    border-radius:8px;
+    font-size:0.78rem;
+    opacity:0;
+    transition:opacity 0.2s ease, transform 0.2s ease;
+    pointer-events:none;
+    z-index:50;
+  }
+  .toast.mostrar{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  input[type="file"].oculto{
+    display:none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="cabecera-grid">
+    <div></div>
+    <div class="cabecera-centro">
+      <h1 id="titulo-armario">Zapateiro de Xaime</h1>
+      <div class="selector-armario">
+        <div class="toggle-contenedor">
+          <button type="button" class="btn-armario activo" id="btn-armario-1">Xaime</button>
+          <button type="button" class="btn-armario" id="btn-armario-2">Saleta</button>
+        </div>
+      </div>
+    </div>
+    <div class="cabecera-derecha">
+      <button type="button" class="btn-redondo" id="btn-importar" title="Importar base de datos (Cargar JSON)" aria-label="Importar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </button>
+      <input type="file" id="input-importar" class="oculto" accept="application/json">
+      <button type="button" class="btn-redondo" id="btn-exportar" title="Exportar base de datos (Descargar JSON)" aria-label="Exportar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      </button>
+      <button type="button" class="btn-primario btn-redondo" id="btn-toggle-alta" title="Añadir zapato" aria-label="Añadir zapato">+</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel-formulario" id="panel-alta">
+    <h3 id="titulo-panel">Añadir zapato</h3>
+    <form id="form-alta">
+      <div class="campos-principales">
+        <div>
+          <label for="input-nombre">Nombre</label>
+          <input type="text" id="input-nombre" placeholder="Ej. Zapatilla running gris" required>
+        </div>
+        <div>
+          <label for="input-marca">Marca</label>
+          <input type="text" id="input-marca" list="lista-marcas" placeholder="Ej. Adidas">
+          <datalist id="lista-marcas"></datalist>
+        </div>
+        <div>
+          <label for="input-caja">N.º de caja</label>
+          <input type="text" id="input-caja" placeholder="Ej. 014" required>
+        </div>
+        <div>
+          <label for="input-foto">Foto <span style="font-weight:400;">(opcional)</span></label>
+          <input type="file" id="input-foto" accept="image/*" capture="environment">
+        </div>
+      </div>
+
+      <div class="preview-row" id="preview-row" style="display:none;">
+        <img id="preview-img" alt="Vista previa">
+        <span id="preview-texto">Vista previa</span>
+      </div>
+
+      <div class="bloque-campo">
+        <label>Color</label>
+        <div class="paleta-colores" id="paleta-colores"></div>
+      </div>
+
+      <div class="bloque-campo">
+        <label>Etiquetas de estilo</label>
+        <div class="tags-actuales" id="tags-actuales"></div>
+        <div class="fila-tag-input">
+          <input type="text" id="input-tag" placeholder="Escribe una etiqueta y pulsa Enter…">
+          <button type="button" id="btn-add-tag">Añadir</button>
+        </div>
+        <div class="sugerencias-tags" id="sugerencias-tags"></div>
+      </div>
+
+      <div class="form-acciones">
+        <button type="button" class="btn-texto" id="btn-cancelar">Cancelar</button>
+        <button type="submit" class="btn-primario" id="btn-guardar">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="barra">
+    <div class="buscador">
+      <input type="text" id="input-buscar" placeholder="Buscar por nombre, marca o caja…">
+    </div>
+    <select id="select-orden">
+      <option value="reciente">Más recientes</option>
+      <option value="nombre">Nombre (A–Z)</option>
+      <option value="caja">N.º de caja</option>
+    </select>
+    <div class="acciones">
+      <button type="button" id="btn-toggle-filtros" class="btn-icono-ajustes" title="Ajustes de filtro">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+        Filtros
+      </button>
+      <button type="button" id="btn-seleccionar">Seleccionar varios</button>
+    </div>
+  </div>
+
+  <div class="barra-filtros" id="barra-filtros">
+    <span class="etiqueta-filtro">Filtrar por:</span>
+    <select id="select-estado">
+      <option value="todos">Estado: todos</option>
+      <option value="guardado">Guardados</option>
+      <option value="fuera">Fuera de caja</option>
+    </select>
+    <select id="select-marca">
+      <option value="todas">Marca: todas</option>
+    </select>
+    <select id="select-color">
+      <option value="todos">Color: todos</option>
+    </select>
+    <select id="select-estilo">
+      <option value="todos">Etiqueta: todas</option>
+    </select>
+  </div>
+
+  <div class="resumen" id="resumen"></div>
+
+  <div class="barra-seleccion" id="barra-seleccion">
+    <span id="texto-seleccion">0 seleccionados</span>
+    <div class="grupo-botones">
+      <button type="button" id="btn-editar-seleccion" class="btn-editar-sel">Editar seleccionados</button>
+      <button type="button" id="btn-cancelar-seleccion">Cancelar</button>
+      <button type="button" id="btn-eliminar-seleccion" class="btn-eliminar-sel">Eliminar seleccionados</button>
+    </div>
+  </div>
+
+  <div class="panel-masivo" id="panel-masivo">
+    <h3>Editar elementos seleccionados</h3>
+    <p class="subtitulo" id="subtitulo-masivo">0 zapatos se verán afectados</p>
+
+    <div class="campo-masivo">
+      <label><input type="checkbox" id="check-marca-masivo"> Cambiar marca a…</label>
+      <div class="contenido-campo-masivo" id="contenido-marca-masivo">
+        <input type="text" id="input-marca-masivo" list="lista-marcas" placeholder="Ej. Adidas">
+      </div>
+    </div>
+
+    <div class="campo-masivo">
+      <label><input type="checkbox" id="check-color-masivo"> Cambiar color a…</label>
+      <div class="contenido-campo-masivo" id="contenido-color-masivo">
+        <div class="paleta-colores" id="paleta-colores-masivo"></div>
+      </div>
+    </div>
+
+    <div class="campo-masivo">
+      <label><input type="checkbox" id="check-estilos-masivo"> Añadir estas etiquetas a todos…</label>
+      <div class="contenido-campo-masivo" id="contenido-estilos-masivo">
+        <div class="tags-actuales" id="tags-masivo"></div>
+        <div class="fila-tag-input">
+          <input type="text" id="input-tag-masivo" placeholder="Escribe una etiqueta y pulsa Enter…">
+          <button type="button" id="btn-add-tag-masivo">Añadir</button>
+        </div>
+        <div class="sugerencias-tags" id="sugerencias-tags-masivo"></div>
+      </div>
+    </div>
+
+    <div class="campo-masivo">
+      <label><input type="checkbox" id="check-estado-masivo"> Cambiar estado a…</label>
+      <div class="contenido-campo-masivo" id="contenido-estado-masivo">
+        <select id="select-estado-masivo">
+          <option value="guardado">Guardado</option>
+          <option value="fuera">Fuera de caja</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-acciones">
+      <button type="button" class="btn-texto" id="btn-cancelar-masivo">Cancelar</button>
+      <button type="button" class="btn-primario" id="btn-aplicar-masivo">Aplicar a seleccionados</button>
+    </div>
+  </div>
+
+  <div class="panel-masivo" id="panel-importacion">
+    <h3>Revisar importación</h3>
+    <p class="subtitulo" id="subtitulo-importacion">0 elementos encontrados en el archivo</p>
+
+    <div class="fila-opciones-importacion">
+      <button type="button" class="btn-mini" id="btn-sel-todos-import">Todos</button>
+      <button type="button" class="btn-mini" id="btn-sel-ninguno-import">Ninguno</button>
+      <button type="button" class="btn-mini" id="btn-sel-nuevos-import">Solo nuevos</button>
+      <button type="button" class="btn-mini" id="btn-sel-existentes-import">Solo existentes</button>
+    </div>
+
+    <div class="lista-importacion" id="lista-importacion"></div>
+
+    <div class="form-acciones">
+      <button type="button" class="btn-texto" id="btn-cancelar-importacion">Cancelar</button>
+      <button type="button" class="btn-primario" id="btn-confirmar-importacion">Importar seleccionados</button>
+    </div>
+  </div>
+
+  <div class="contador" id="contador"></div>
+  <div class="grid" id="grid"></div>
+  <div class="vacio" id="vacio" style="display:none;">Todavía no hay zapatos registrados en este armario.</div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const DB_NAME = 'ZapatosDB';
+  const DB_VERSION = 2;
+  let db;
+
+  let armarioActivo = 1;
+
+  function obtenerAlmacenActivo(){
+    return armarioActivo === 1 ? 'zapatos' : 'armario_2';
+  }
+
+  const COLORES = [
+    { nombre:'Blanco',    hex:'#ffffff' },
+    { nombre:'Negro',     hex:'#111111' },
+    { nombre:'Gris',      hex:'#9c9c9c' },
+    { nombre:'Beige',     hex:'#e3d5b8' },
+    { nombre:'Marrón',    hex:'#7b4b2a' },
+    { nombre:'Rojo',      hex:'#c0392b' },
+    { nombre:'Rosa',      hex:'#e8a0bf' },
+    { nombre:'Naranja',   hex:'#e67e22' },
+    { nombre:'Amarillo',  hex:'#f1c40f' },
+    { nombre:'Verde',     hex:'#2e8b57' },
+    { nombre:'Turquesa',  hex:'#1abc9c' },
+    { nombre:'Azul',      hex:'#2980b9' },
+    { nombre:'Marino',    hex:'#1b2a4a' },
+    { nombre:'Morado',    hex:'#8e44ad' },
+    { nombre:'Granate',   hex:'#6e1423' },
+    { nombre:'Dorado',    hex:'#c9a227' },
+    { nombre:'Plateado',  hex:'#b0b0b0' },
+    { nombre:'Multicolor', hex:null },
+  ];
+
+  const ESTILOS_SUGERIDOS = ['Zapatilla', 'Vestir', 'Deporte', 'Casual', 'Bota', 'Sandalia', 'Formal', 'Verano', 'Invierno'];
+
+  function abrirDB(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const _db = e.target.result;
+        if(!_db.objectStoreNames.contains('zapatos')){
+          const store1 = _db.createObjectStore('zapatos', { keyPath:'id', autoIncrement:true });
+          store1.createIndex('caja', 'caja', { unique:false });
+          store1.createIndex('nombre', 'nombre', { unique:false });
+        }
+        if(!_db.objectStoreNames.contains('armario_2')){
+          const store2 = _db.createObjectStore('armario_2', { keyPath:'id', autoIncrement:true });
+          store2.createIndex('caja', 'caja', { unique:false });
+          store2.createIndex('nombre', 'nombre', { unique:false });
+        }
+      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function getStore(modo){
+    const storeName = obtenerAlmacenActivo();
+    const tx = db.transaction(storeName, modo);
+    return tx.objectStore(storeName);
+  }
+
+  function agregarZapato(item){
+    return new Promise((resolve, reject) => {
+      const store = getStore('readwrite');
+      const req = store.add(item);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function actualizarZapato(item){
+    return new Promise((resolve, reject) => {
+      const store = getStore('readwrite');
+      const req = store.put(item);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function obtenerTodos(){
+    return new Promise((resolve, reject) => {
+      const store = getStore('readonly');
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function borrarZapato(id){
+    return new Promise((resolve, reject) => {
+      const store = getStore('readwrite');
+      const req = store.delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  // --- Carga Automática desde JSON en GitHub Pages ---
+  async function sincronizarDesdeServidor(){
+    try {
+      const datosLocales = await obtenerTodos();
+      if(datosLocales.length === 0){
+        const res = await fetch('inventario-zapatos.json');
+        if(res.ok){
+          const data = await res.json();
+          const registros = Array.isArray(data) ? data : data.registros;
+          if(Array.isArray(registros)){
+            for(const item of registros){
+              await agregarZapato({
+                nombre: item.nombre,
+                marca: item.marca || '',
+                foto: item.foto || '',
+                caja: item.caja,
+                color: item.color || '',
+                estilos: Array.isArray(item.estilos) ? item.estilos : [],
+                estado: item.estado === 'fuera' ? 'fuera' : 'guardado',
+                fecha: item.fecha || new Date().toISOString()
+              });
+            }
+            mostrarToast('Datos sincronizados automáticamente');
+          }
+        }
+      }
+    } catch(err) {
+      console.log('No se cargó JSON por defecto o se está ejecutando localmente');
+    }
+  }
+
+  // --- UI Elements ---
+  const tituloArmario = document.getElementById('titulo-armario');
+  const btnArmario1 = document.getElementById('btn-armario-1');
+  const btnArmario2 = document.getElementById('btn-armario-2');
+  const btnToggleAlta = document.getElementById('btn-toggle-alta');
+  const btnToggleFiltros = document.getElementById('btn-toggle-filtros');
+  const barraFiltros = document.getElementById('barra-filtros');
+  const inputFoto = document.getElementById('input-foto');
+  const inputNombre = document.getElementById('input-nombre');
+  const inputMarca = document.getElementById('input-marca');
+  const listaMarcas = document.getElementById('lista-marcas');
+  const inputCaja = document.getElementById('input-caja');
+  const form = document.getElementById('form-alta');
+  const panelAlta = document.getElementById('panel-alta');
+  const tituloPanel = document.getElementById('titulo-panel');
+  const previewRow = document.getElementById('preview-row');
+  const previewImg = document.getElementById('preview-img');
+  const previewTexto = document.getElementById('preview-texto');
+  const paletaColores = document.getElementById('paleta-colores');
+  const tagsActuales = document.getElementById('tags-actuales');
+  const inputTag = document.getElementById('input-tag');
+  const btnAddTag = document.getElementById('btn-add-tag');
+  const sugerenciasTags = document.getElementById('sugerencias-tags');
+  const grid = document.getElementById('grid');
+  const vacio = document.getElementById('vacio');
+  const inputBuscar = document.getElementById('input-buscar');
+  const selectOrden = document.getElementById('select-orden');
+  const selectEstado = document.getElementById('select-estado');
+  const selectMarca = document.getElementById('select-marca');
+  const selectColor = document.getElementById('select-color');
+  const selectEstilo = document.getElementById('select-estilo');
+  const contador = document.getElementById('contador');
+  const resumen = document.getElementById('resumen');
+  const toastEl = document.getElementById('toast');
+  const btnGuardar = document.getElementById('btn-guardar');
+  const btnCancelar = document.getElementById('btn-cancelar');
+  const btnExportar = document.getElementById('btn-exportar');
+  const btnImportar = document.getElementById('btn-importar');
+  const inputImportar = document.getElementById('input-importar');
+  const btnSeleccionar = document.getElementById('btn-seleccionar');
+  const barraSeleccion = document.getElementById('barra-seleccion');
+  const textoSeleccion = document.getElementById('texto-seleccion');
+  const btnCancelarSeleccion = document.getElementById('btn-cancelar-seleccion');
+  const btnEliminarSeleccion = document.getElementById('btn-eliminar-seleccion');
+
+  // --- Edición masiva ---
+  const btnEditarSeleccion = document.getElementById('btn-editar-seleccion');
+  const panelMasivo = document.getElementById('panel-masivo');
+  const subtituloMasivo = document.getElementById('subtitulo-masivo');
+  const checkMarcaMasivo = document.getElementById('check-marca-masivo');
+  const contenidoMarcaMasivo = document.getElementById('contenido-marca-masivo');
+  const inputMarcaMasivo = document.getElementById('input-marca-masivo');
+  const checkColorMasivo = document.getElementById('check-color-masivo');
+  const contenidoColorMasivo = document.getElementById('contenido-color-masivo');
+  const paletaColoresMasivo = document.getElementById('paleta-colores-masivo');
+  const checkEstilosMasivo = document.getElementById('check-estilos-masivo');
+  const contenidoEstilosMasivo = document.getElementById('contenido-estilos-masivo');
+  const tagsMasivo = document.getElementById('tags-masivo');
+  const inputTagMasivo = document.getElementById('input-tag-masivo');
+  const btnAddTagMasivo = document.getElementById('btn-add-tag-masivo');
+  const sugerenciasTagsMasivo = document.getElementById('sugerencias-tags-masivo');
+  const checkEstadoMasivo = document.getElementById('check-estado-masivo');
+  const contenidoEstadoMasivo = document.getElementById('contenido-estado-masivo');
+  const selectEstadoMasivo = document.getElementById('select-estado-masivo');
+  const btnCancelarMasivo = document.getElementById('btn-cancelar-masivo');
+  const btnAplicarMasivo = document.getElementById('btn-aplicar-masivo');
+
+  let fotoBase64 = null;
+  let todosLosZapatos = [];
+  let editandoId = null;
+  let estadoEdicion = 'guardado';
+  let colorSeleccionado = '';
+  let estilosSeleccionados = [];
+  let modoSeleccion = false;
+  let seleccionados = new Set();
+  let colorMasivoSeleccionado = '';
+  let estilosMasivoSeleccionados = [];
+
+  // Toggle de filtros
+  btnToggleFiltros.addEventListener('click', () => {
+    const activo = barraFiltros.classList.toggle('activo');
+    btnToggleFiltros.classList.toggle('activo', activo);
+  });
+
+  // Toggle del formulario (+)
+  btnToggleAlta.addEventListener('click', () => {
+    if(panelAlta.classList.contains('activo') && editandoId === null){
+      panelAlta.classList.remove('activo');
+    }else{
+      entrarModoAlta();
+      panelAlta.classList.add('activo');
+      panelAlta.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  });
+
+  function cambiarArmario(num){
+    if(armarioActivo === num) return;
+    armarioActivo = num;
+    btnArmario1.classList.toggle('activo', num === 1);
+    btnArmario2.classList.toggle('activo', num === 2);
+    tituloArmario.textContent = num === 1 ? 'Zapateiro de Xaime' : 'Zapateiro de Saleta';
+
+    entrarModoAlta();
+    panelAlta.classList.remove('activo');
+    cerrarPanelMasivo();
+    cerrarPanelImportacion();
+    modoSeleccion = false;
+    seleccionados.clear();
+    actualizarBarraSeleccion();
+
+    mostrarToast(`Cambiado a ${num === 1 ? 'Zapateiro de Xaime' : 'Zapateiro de Saleta'}`);
+    cargarYRenderizar();
+  }
+
+  btnArmario1.addEventListener('click', () => cambiarArmario(1));
+  btnArmario2.addEventListener('click', () => cambiarArmario(2));
+
+  function estadoDe(item){
+    return item.estado === 'fuera' ? 'fuera' : 'guardado';
+  }
+  function marcaDe(item){
+    return item.marca || '';
+  }
+  function colorDe(item){
+    return item.color || '';
+  }
+  function estilosDe(item){
+    return Array.isArray(item.estilos) ? item.estilos : [];
+  }
+
+  function mostrarToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('mostrar');
+    setTimeout(() => toastEl.classList.remove('mostrar'), 1800);
+  }
+
+  function escaparHTML(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function archivoABase64(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  inputFoto.addEventListener('change', async () => {
+    const file = inputFoto.files[0];
+    if(!file) return;
+    fotoBase64 = await archivoABase64(file);
+    previewImg.style.display = 'block';
+    previewImg.src = fotoBase64;
+    previewTexto.textContent = 'Vista previa';
+    previewRow.style.display = 'flex';
+  });
+
+  function pintarPaletaColores(){
+    paletaColores.innerHTML = '';
+    COLORES.forEach(c => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'swatch' + (c.nombre === colorSeleccionado ? ' seleccionado' : '') + (c.nombre === 'Multicolor' ? ' multicolor' : '');
+      const punto = c.hex ? `style="background:${c.hex};"` : '';
+      btn.innerHTML = `<span class="punto" ${punto}></span>${c.nombre}`;
+      btn.addEventListener('click', () => {
+        colorSeleccionado = (colorSeleccionado === c.nombre) ? '' : c.nombre;
+        pintarPaletaColores();
+      });
+      paletaColores.appendChild(btn);
+    });
+  }
+
+  function obtenerHexColor(nombre){
+    const c = COLORES.find(x => x.nombre === nombre);
+    return c ? c.hex : null;
+  }
+
+  function pintarTagsActuales(){
+    tagsActuales.innerHTML = '';
+    estilosSeleccionados.forEach(tag => {
+      const chip = document.createElement('span');
+      chip.className = 'tag';
+      chip.innerHTML = `${escaparHTML(tag)} <button type="button" aria-label="Quitar etiqueta">&times;</button>`;
+      chip.querySelector('button').addEventListener('click', () => {
+        estilosSeleccionados = estilosSeleccionados.filter(t => t !== tag);
+        pintarTagsActuales();
+      });
+      tagsActuales.appendChild(chip);
+    });
+  }
+
+  function agregarEtiqueta(texto){
+    const limpio = texto.trim();
+    if(!limpio) return;
+    const yaExiste = estilosSeleccionados.some(t => t.toLowerCase() === limpio.toLowerCase());
+    if(!yaExiste){
+      estilosSeleccionados.push(limpio);
+      pintarTagsActuales();
+    }
+    inputTag.value = '';
+  }
+
+  btnAddTag.addEventListener('click', () => agregarEtiqueta(inputTag.value));
+  inputTag.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      agregarEtiqueta(inputTag.value);
+    }
+  });
+
+  function todasLasEtiquetasConocidas(){
+    const usadas = new Set();
+    todosLosZapatos.forEach(z => estilosDe(z).forEach(t => usadas.add(t)));
+    ESTILOS_SUGERIDOS.forEach(t => usadas.add(t));
+    return [...usadas].sort((a,b) => a.localeCompare(b, 'es'));
+  }
+
+  function pintarSugerenciasTags(){
+    sugerenciasTags.innerHTML = '';
+    todasLasEtiquetasConocidas().forEach(tag => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip-sugerida';
+      chip.textContent = '+ ' + tag;
+      chip.addEventListener('click', () => agregarEtiqueta(tag));
+      sugerenciasTags.appendChild(chip);
+    });
+  }
+
+  function entrarModoAlta(){
+    editandoId = null;
+    estadoEdicion = 'guardado';
+    colorSeleccionado = '';
+    estilosSeleccionados = [];
+    form.reset();
+    fotoBase64 = null;
+    previewRow.style.display = 'none';
+    tituloPanel.textContent = 'Añadir zapato';
+    btnGuardar.textContent = 'Guardar';
+    pintarPaletaColores();
+    pintarTagsActuales();
+    pintarSugerenciasTags();
+  }
+
+  function entrarModoEdicion(item){
+    editandoId = item.id;
+    estadoEdicion = estadoDe(item);
+    colorSeleccionado = colorDe(item);
+    estilosSeleccionados = [...estilosDe(item)];
+    inputNombre.value = item.nombre;
+    inputMarca.value = marcaDe(item);
+    inputCaja.value = item.caja;
+    fotoBase64 = item.foto || null;
+    inputFoto.value = '';
+    if(item.foto){
+      previewImg.style.display = 'block';
+      previewImg.src = item.foto;
+      previewTexto.textContent = 'Foto actual · sube otra para reemplazarla';
+    }else{
+      previewImg.style.display = 'none';
+      previewTexto.textContent = 'Sin foto todavía · súbela cuando la tengas a mano';
+    }
+    previewRow.style.display = 'flex';
+    tituloPanel.textContent = 'Editar zapato';
+    btnGuardar.textContent = 'Guardar cambios';
+    pintarPaletaColores();
+    pintarTagsActuales();
+    pintarSugerenciasTags();
+    panelAlta.classList.add('activo');
+    panelAlta.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  btnCancelar.addEventListener('click', () => {
+    entrarModoAlta();
+    panelAlta.classList.remove('activo');
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = inputNombre.value.trim();
+    const marca = inputMarca.value.trim();
+    const caja = inputCaja.value.trim();
+    if(!nombre || !caja){
+      mostrarToast('Completa al menos nombre y caja');
+      return;
+    }
+    btnGuardar.disabled = true;
+    try{
+      if(editandoId !== null){
+        await actualizarZapato({
+          id: editandoId,
+          nombre, marca, caja,
+          color: colorSeleccionado,
+          estilos: estilosSeleccionados,
+          foto: fotoBase64 || '',
+          estado: estadoEdicion,
+          fecha: new Date().toISOString()
+        });
+        mostrarToast('Cambios guardados');
+      }else{
+        await agregarZapato({
+          nombre, marca, caja,
+          color: colorSeleccionado,
+          estilos: estilosSeleccionados,
+          foto: fotoBase64 || '',
+          estado: 'guardado',
+          fecha: new Date().toISOString()
+        });
+        mostrarToast(fotoBase64 ? 'Zapato guardado' : 'Zapato guardado sin foto');
+      }
+      entrarModoAlta();
+      panelAlta.classList.remove('activo');
+      await cargarYRenderizar();
+    }catch(err){
+      console.error(err);
+      mostrarToast('Error al guardar');
+    }finally{
+      btnGuardar.disabled = false;
+    }
+  });
+
+  async function cambiarEstado(id){
+    const item = todosLosZapatos.find(z => z.id === id);
+    if(!item) return;
+    const nuevoEstado = estadoDe(item) === 'fuera' ? 'guardado' : 'fuera';
+    try{
+      await actualizarZapato({ ...item, estado: nuevoEstado });
+      mostrarToast(nuevoEstado === 'fuera' ? 'Marcado como fuera de caja' : 'Guardado en su caja');
+      if(editandoId === id) estadoEdicion = nuevoEstado;
+      await cargarYRenderizar();
+    }catch(err){
+      console.error(err);
+      mostrarToast('No se pudo actualizar el estado');
+    }
+  }
+
+  function ordenarLista(lista, criterio){
+    const copia = [...lista];
+    if(criterio === 'nombre'){
+      copia.sort((a,b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity:'base' }));
+    }else if(criterio === 'caja'){
+      copia.sort((a,b) => a.caja.localeCompare(b.caja, 'es', { numeric:true, sensitivity:'base' }));
+    }else{
+      copia.sort((a,b) => b.id - a.id);
+    }
+    return copia;
+  }
+
+  function actualizarBarraSeleccion(){
+    grid.classList.toggle('modo-seleccion', modoSeleccion);
+    barraSeleccion.classList.toggle('activa', modoSeleccion);
+    btnSeleccionar.style.display = modoSeleccion ? 'none' : 'inline-block';
+    textoSeleccion.textContent = seleccionados.size + (seleccionados.size === 1 ? ' seleccionado' : ' seleccionados');
+    if(!modoSeleccion){
+      cerrarPanelMasivo();
+    }
+  }
+
+  function toggleSeleccion(id){
+    if(seleccionados.has(id)) seleccionados.delete(id);
+    else seleccionados.add(id);
+    actualizarBarraSeleccion();
+    if(panelMasivo.classList.contains('activo')){
+      subtituloMasivo.textContent = seleccionados.size + (seleccionados.size === 1 ? ' zapato se verá afectado' : ' zapatos se verán afectados');
+    }
+    aplicarFiltro();
+  }
+
+  btnSeleccionar.addEventListener('click', () => {
+    modoSeleccion = true;
+    seleccionados.clear();
+    actualizarBarraSeleccion();
+    aplicarFiltro();
+  });
+
+  btnCancelarSeleccion.addEventListener('click', () => {
+    modoSeleccion = false;
+    seleccionados.clear();
+    actualizarBarraSeleccion();
+    aplicarFiltro();
+  });
+
+  btnEliminarSeleccion.addEventListener('click', async () => {
+    if(seleccionados.size === 0) return;
+    const n = seleccionados.size;
+    const confirmado = confirm(`¿Eliminar ${n} zapato(s) seleccionados? Esta acción no se puede deshacer.`);
+    if(!confirmado) return;
+    try{
+      for(const id of seleccionados){
+        await borrarZapato(id);
+      }
+      mostrarToast(`${n} eliminado(s)`);
+      modoSeleccion = false;
+      seleccionados.clear();
+      actualizarBarraSeleccion();
+      await cargarYRenderizar();
+    }catch(err){
+      console.error(err);
+      mostrarToast('No se pudieron eliminar todos los seleccionados');
+    }
+  });
+
+  function pintarPaletaColoresMasivo(){
+    paletaColoresMasivo.innerHTML = '';
+    COLORES.forEach(c => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'swatch' + (c.nombre === colorMasivoSeleccionado ? ' seleccionado' : '') + (c.nombre === 'Multicolor' ? ' multicolor' : '');
+      const punto = c.hex ? `style="background:${c.hex};"` : '';
+      btn.innerHTML = `<span class="punto" ${punto}></span>${c.nombre}`;
+      btn.addEventListener('click', () => {
+        colorMasivoSeleccionado = (colorMasivoSeleccionado === c.nombre) ? '' : c.nombre;
+        pintarPaletaColoresMasivo();
+      });
+      paletaColoresMasivo.appendChild(btn);
+    });
+  }
+
+  function pintarTagsMasivo(){
+    tagsMasivo.innerHTML = '';
+    estilosMasivoSeleccionados.forEach(tag => {
+      const chip = document.createElement('span');
+      chip.className = 'tag';
+      chip.innerHTML = `${escaparHTML(tag)} <button type="button" aria-label="Quitar etiqueta">&times;</button>`;
+      chip.querySelector('button').addEventListener('click', () => {
+        estilosMasivoSeleccionados = estilosMasivoSeleccionados.filter(t => t !== tag);
+        pintarTagsMasivo();
+      });
+      tagsMasivo.appendChild(chip);
+    });
+  }
+
+  function agregarEtiquetaMasivo(texto){
+    const limpio = texto.trim();
+    if(!limpio) return;
+    const yaExiste = estilosMasivoSeleccionados.some(t => t.toLowerCase() === limpio.toLowerCase());
+    if(!yaExiste){
+      estilosMasivoSeleccionados.push(limpio);
+      pintarTagsMasivo();
+    }
+    inputTagMasivo.value = '';
+  }
+
+  btnAddTagMasivo.addEventListener('click', () => agregarEtiquetaMasivo(inputTagMasivo.value));
+  inputTagMasivo.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      agregarEtiquetaMasivo(inputTagMasivo.value);
+    }
+  });
+
+  function pintarSugerenciasTagsMasivo(){
+    sugerenciasTagsMasivo.innerHTML = '';
+    todasLasEtiquetasConocidas().forEach(tag => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip-sugerida';
+      chip.textContent = '+ ' + tag;
+      chip.addEventListener('click', () => agregarEtiquetaMasivo(tag));
+      sugerenciasTagsMasivo.appendChild(chip);
+    });
+  }
+
+  function vincularCheckMasivo(checkbox, contenedor){
+    checkbox.addEventListener('change', () => {
+      contenedor.classList.toggle('activo', checkbox.checked);
+    });
+  }
+  vincularCheckMasivo(checkMarcaMasivo, contenidoMarcaMasivo);
+  vincularCheckMasivo(checkColorMasivo, contenidoColorMasivo);
+  vincularCheckMasivo(checkEstilosMasivo, contenidoEstilosMasivo);
+  vincularCheckMasivo(checkEstadoMasivo, contenidoEstadoMasivo);
+
+  function abrirPanelMasivo(){
+    checkMarcaMasivo.checked = false;
+    checkColorMasivo.checked = false;
+    checkEstilosMasivo.checked = false;
+    checkEstadoMasivo.checked = false;
+    contenidoMarcaMasivo.classList.remove('activo');
+    contenidoColorMasivo.classList.remove('activo');
+    contenidoEstilosMasivo.classList.remove('activo');
+    contenidoEstadoMasivo.classList.remove('activo');
+    inputMarcaMasivo.value = '';
+    colorMasivoSeleccionado = '';
+    estilosMasivoSeleccionados = [];
+    selectEstadoMasivo.value = 'guardado';
+    pintarPaletaColoresMasivo();
+    pintarTagsMasivo();
+    pintarSugerenciasTagsMasivo();
+    subtituloMasivo.textContent = seleccionados.size + (seleccionados.size === 1 ? ' zapato se verá afectado' : ' zapatos se verán afectados');
+    panelMasivo.classList.add('activo');
+    panelMasivo.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function cerrarPanelMasivo(){
+    panelMasivo.classList.remove('activo');
+  }
+
+  btnEditarSeleccion.addEventListener('click', () => {
+    if(seleccionados.size === 0){
+      mostrarToast('Selecciona al menos un zapato');
+      return;
+    }
+    abrirPanelMasivo();
+  });
+
+  btnCancelarMasivo.addEventListener('click', () => {
+    cerrarPanelMasivo();
+  });
+
+  btnAplicarMasivo.addEventListener('click', async () => {
+    const cambiarMarca = checkMarcaMasivo.checked;
+    const cambiarColor = checkColorMasivo.checked;
+    const anadirEstilos = checkEstilosMasivo.checked && estilosMasivoSeleccionados.length > 0;
+    const cambiarEstadoMasivo = checkEstadoMasivo.checked;
+
+    if(!cambiarMarca && !cambiarColor && !anadirEstilos && !cambiarEstadoMasivo){
+      mostrarToast('Marca al menos un campo para aplicar cambios');
+      return;
+    }
+
+    const nuevaMarca = inputMarcaMasivo.value.trim();
+    const nuevoEstadoMasivo = selectEstadoMasivo.value;
+
+    btnAplicarMasivo.disabled = true;
+    try{
+      let actualizados = 0;
+      for(const id of seleccionados){
+        const item = todosLosZapatos.find(z => z.id === id);
+        if(!item) continue;
+
+        const cambios = { ...item };
+        if(cambiarMarca) cambios.marca = nuevaMarca;
+        if(cambiarColor) cambios.color = colorMasivoSeleccionado;
+        if(anadirEstilos){
+          const existentes = estilosDe(item);
+          const combinadas = [...existentes];
+          estilosMasivoSeleccionados.forEach(t => {
+            if(!combinadas.some(e => e.toLowerCase() === t.toLowerCase())) combinadas.push(t);
+          });
+          cambios.estilos = combinadas;
+        }
+        if(cambiarEstadoMasivo) cambios.estado = nuevoEstadoMasivo;
+
+        await actualizarZapato(cambios);
+        actualizados++;
+      }
+      mostrarToast(`${actualizados} zapato(s) actualizados`);
+      modoSeleccion = false;
+      seleccionados.clear();
+      actualizarBarraSeleccion();
+      cerrarPanelMasivo();
+      await cargarYRenderizar();
+    }catch(err){
+      console.error(err);
+      mostrarToast('No se pudieron aplicar todos los cambios');
+    }finally{
+      btnAplicarMasivo.disabled = false;
+    }
+  });
+
+  function renderizar(lista){
+    grid.innerHTML = '';
+    if(lista.length === 0){
+      vacio.style.display = 'block';
+      contador.textContent = '';
+      return;
+    }
+    vacio.style.display = 'none';
+    contador.textContent = lista.length + (lista.length === 1 ? ' resultado' : ' resultados');
+
+    const ordenada = ordenarLista(lista, selectOrden.value);
+
+    ordenada.forEach(item => {
+      const fuera = estadoDe(item) === 'fuera';
+      const marca = marcaDe(item);
+      const color = colorDe(item);
+      const hexColor = obtenerHexColor(color);
+      const estilos = estilosDe(item);
+      const seleccionada = seleccionados.has(item.id);
+
+      const tarjeta = document.createElement('div');
+      tarjeta.className = 'tarjeta' + (fuera ? ' fuera' : '') + (seleccionada ? ' seleccionada' : '');
+      tarjeta.innerHTML = `
+        <button type="button" class="checkbox-seleccion" data-id="${item.id}" aria-label="Seleccionar">${seleccionada ? '&#10003;' : ''}</button>
+        <div class="acciones-tarjeta">
+          <button class="btn-icono editar" title="Editar" data-id="${item.id}" aria-label="Editar">&#9998;</button>
+          <button class="btn-icono borrar" title="Eliminar" data-id="${item.id}" aria-label="Eliminar">&times;</button>
+        </div>
+        <div class="foto-wrap">${item.foto
+          ? `<img src="${item.foto}" alt="${escaparHTML(item.nombre)}">`
+          : `<div class="placeholder-foto">Sin foto</div>`}</div>
+        <div class="info">
+          <div class="fila-nombre">
+            <div class="nombre">${escaparHTML(item.nombre)}</div>
+            ${fuera ? '<span class="etiqueta-fuera">Fuera</span>' : ''}
+            ${!item.foto ? '<span class="etiqueta-sinfoto">Sin foto</span>' : ''}
+          </div>
+          ${marca ? `<div class="marca">${escaparHTML(marca)}</div>` : ''}
+          <div class="caja">
+            ${color ? `<span class="punto-color${color === 'Multicolor' ? ' multicolor' : ''}" style="${hexColor ? `background:${hexColor};` : ''}"></span>` : ''}
+            Caja ${escaparHTML(item.caja)}${color ? ' · ' + escaparHTML(color) : ''}
+          </div>
+          ${estilos.length ? `<div class="lista-etiquetas">${estilos.map(t => `<span class="etiqueta-mini">${escaparHTML(t)}</span>`).join('')}</div>` : ''}
+          <button class="btn-estado ${fuera ? 'accion-guardar' : 'accion-sacar'}" data-id="${item.id}">
+            ${fuera ? 'Guardar' : 'Sacar'}
+          </button>
+        </div>
+      `;
+
+      if(modoSeleccion){
+        tarjeta.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleSeleccion(item.id);
+        });
+      }
+
+      grid.appendChild(tarjeta);
+    });
+
+    if(!modoSeleccion){
+      grid.querySelectorAll('.btn-icono.borrar').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = Number(btn.dataset.id);
+          if(confirm('¿Eliminar este registro?')){
+            await borrarZapato(id);
+            if(editandoId === id) entrarModoAlta();
+            mostrarToast('Eliminado');
+            await cargarYRenderizar();
+          }
+        });
+      });
+
+      grid.querySelectorAll('.btn-icono.editar').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = Number(btn.dataset.id);
+          const item = todosLosZapatos.find(z => z.id === id);
+          if(item) entrarModoEdicion(item);
+        });
+      });
+
+      grid.querySelectorAll('.btn-estado').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = Number(btn.dataset.id);
+          cambiarEstado(id);
+        });
+      });
+    }
+  }
+
+  function aplicarFiltro(){
+    const q = inputBuscar.value.trim().toLowerCase();
+    const filtroEstado = selectEstado.value;
+    const filtroMarca = selectMarca.value;
+    const filtroColor = selectColor.value;
+    const filtroEstilo = selectEstilo.value;
+
+    let lista = todosLosZapatos;
+    if(filtroEstado !== 'todos'){
+      lista = lista.filter(z => estadoDe(z) === filtroEstado);
+    }
+    if(filtroMarca !== 'todas'){
+      lista = lista.filter(z => marcaDe(z) === filtroMarca);
+    }
+    if(filtroColor !== 'todos'){
+      lista = lista.filter(z => colorDe(z) === filtroColor);
+    }
+    if(filtroEstilo !== 'todos'){
+      lista = lista.filter(z => estilosDe(z).includes(filtroEstilo));
+    }
+    if(q){
+      lista = lista.filter(z =>
+        z.nombre.toLowerCase().includes(q) ||
+        z.caja.toLowerCase().includes(q) ||
+        marcaDe(z).toLowerCase().includes(q)
+      );
+    }
+    renderizar(lista);
+  }
+
+  function actualizarResumen(){
+    const total = todosLosZapatos.length;
+    const fuera = todosLosZapatos.filter(z => estadoDe(z) === 'fuera').length;
+    const sinFoto = todosLosZapatos.filter(z => !z.foto).length;
+    if(total === 0){
+      resumen.innerHTML = '';
+      return;
+    }
+    resumen.innerHTML = `${total} en total · <strong>${fuera} fuera de caja</strong>` +
+      (sinFoto > 0 ? ` · <strong>${sinFoto} sin foto</strong>` : '');
+  }
+
+  function actualizarOpcionesFiltro(){
+    const marcas = [...new Set(todosLosZapatos.map(marcaDe).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'es'));
+    const coloresUsados = [...new Set(todosLosZapatos.map(colorDe).filter(Boolean))];
+    const estilosUsados = [...new Set(todosLosZapatos.flatMap(estilosDe))].sort((a,b) => a.localeCompare(b, 'es'));
+
+    const valorMarca = selectMarca.value;
+    selectMarca.innerHTML = '<option value="todas">Marca: todas</option>' +
+      marcas.map(m => `<option value="${escaparHTML(m)}">${escaparHTML(m)}</option>`).join('');
+    if(marcas.includes(valorMarca)) selectMarca.value = valorMarca;
+
+    const valorColor = selectColor.value;
+    const coloresOrdenados = COLORES.map(c => c.nombre).filter(n => coloresUsados.includes(n));
+    selectColor.innerHTML = '<option value="todos">Color: todos</option>' +
+      coloresOrdenados.map(c => `<option value="${escaparHTML(c)}">${escaparHTML(c)}</option>`).join('');
+    if(coloresOrdenados.includes(valorColor)) selectColor.value = valorColor;
+
+    const valorEstilo = selectEstilo.value;
+    selectEstilo.innerHTML = '<option value="todos">Etiqueta: todas</option>' +
+      estilosUsados.map(t => `<option value="${escaparHTML(t)}">${escaparHTML(t)}</option>`).join('');
+    if(estilosUsados.includes(valorEstilo)) selectEstilo.value = valorEstilo;
+
+    listaMarcas.innerHTML = marcas.map(m => `<option value="${escaparHTML(m)}"></option>`).join('');
+  }
+
+  inputBuscar.addEventListener('input', aplicarFiltro);
+  selectOrden.addEventListener('change', aplicarFiltro);
+  selectEstado.addEventListener('change', aplicarFiltro);
+  selectMarca.addEventListener('change', aplicarFiltro);
+  selectColor.addEventListener('change', aplicarFiltro);
+  selectEstilo.addEventListener('change', aplicarFiltro);
+
+  async function cargarYRenderizar(){
+    todosLosZapatos = await obtenerTodos();
+    actualizarResumen();
+    actualizarOpcionesFiltro();
+    aplicarFiltro();
+  }
+
+  // --- Exportar (Descargar) ---
+  btnExportar.addEventListener('click', async () => {
+    const datos = await obtenerTodos();
+    if(datos.length === 0){
+      mostrarToast('No hay nada que exportar');
+      return;
+    }
+    const payload = {
+      app: 'ZapatosDB',
+      armario: armarioActivo,
+      version: 4,
+      exportado: new Date().toISOString(),
+      registros: datos
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const fecha = new Date().toISOString().slice(0,10);
+    a.download = `inventario-armario-${armarioActivo}-${fecha}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    mostrarToast(`Exportado Armario ${armarioActivo}`);
+  });
+
+  // --- Importar (Cargar) ---
+  const panelImportacion = document.getElementById('panel-importacion');
+  const subtituloImportacion = document.getElementById('subtitulo-importacion');
+  const listaImportacion = document.getElementById('lista-importacion');
+  const btnSelTodosImport = document.getElementById('btn-sel-todos-import');
+  const btnSelNingunoImport = document.getElementById('btn-sel-ninguno-import');
+  const btnSelNuevosImport = document.getElementById('btn-sel-nuevos-import');
+  const btnSelExistentesImport = document.getElementById('btn-sel-existentes-import');
+  const btnCancelarImportacion = document.getElementById('btn-cancelar-importacion');
+  const btnConfirmarImportacion = document.getElementById('btn-confirmar-importacion');
+
+  let elementosAImportar = [];
+
+  btnImportar.addEventListener('click', () => inputImportar.click());
+
+  inputImportar.addEventListener('change', async () => {
+    const file = inputImportar.files[0];
+    if(!file) return;
+    try{
+      const texto = await file.text();
+      const data = JSON.parse(texto);
+      const registros = Array.isArray(data) ? data : data.registros;
+      if(!Array.isArray(registros)) throw new Error('Formato no válido');
+
+      const validos = registros.filter(r => r && r.nombre && r.caja);
+      if(validos.length === 0){
+        mostrarToast('El archivo no contiene registros válidos');
+        inputImportar.value = '';
+        return;
+      }
+
+      const actuales = await obtenerTodos();
+      const porCaja = new Map(actuales.map(z => [String(z.caja).trim(), z]));
+
+      elementosAImportar = validos.map(r => ({
+        datos: {
+          nombre: r.nombre,
+          marca: r.marca || '',
+          foto: r.foto || '',
+          caja: r.caja,
+          color: r.color || '',
+          estilos: Array.isArray(r.estilos) ? r.estilos : [],
+          estado: r.estado === 'fuera' ? 'fuera' : 'guardado',
+          fecha: r.fecha || new Date().toISOString()
+        },
+        existente: porCaja.get(String(r.caja).trim()) || null,
+        incluir: true
+      }));
+
+      abrirPanelImportacion();
+    }catch(err){
+      console.error(err);
+      mostrarToast('No se pudo leer el archivo JSON');
+    }finally{
+      inputImportar.value = '';
+    }
+  });
+
+  function actualizarSubtituloImportacion(){
+    const total = elementosAImportar.length;
+    const incluidos = elementosAImportar.filter(e => e.incluir).length;
+    const nuevos = elementosAImportar.filter(e => e.incluir && !e.existente).length;
+    const existentes = elementosAImportar.filter(e => e.incluir && e.existente).length;
+    subtituloImportacion.textContent =
+      `Armario ${armarioActivo} · ${total} elemento(s) en el archivo · ${incluidos} seleccionados ` +
+      `(${nuevos} nuevo(s), ${existentes} sobrescribirán)`;
+  }
+
+  function pintarListaImportacion(){
+    listaImportacion.innerHTML = '';
+    elementosAImportar.forEach((el, indice) => {
+      const fila = document.createElement('label');
+      fila.className = 'fila-importacion' + (el.incluir ? '' : ' desactivada');
+      const badge = el.existente
+        ? '<span class="badge-import existente">Sobrescribe</span>'
+        : '<span class="badge-import nuevo">Nuevo</span>';
+      const detalle = el.existente
+        ? `Caja ${escaparHTML(String(el.datos.caja))} · reemplaza "${escaparHTML(el.existente.nombre)}"`
+        : `Caja ${escaparHTML(String(el.datos.caja))}`;
+      fila.innerHTML = `
+        <input type="checkbox" data-indice="${indice}" ${el.incluir ? 'checked' : ''}>
+        <div class="info-fila">
+          <div class="nombre-fila">${escaparHTML(el.datos.nombre)}</div>
+          <div class="detalle-fila">${detalle}</div>
+        </div>
+        ${badge}
+      `;
+      listaImportacion.appendChild(fila);
+    });
+
+    listaImportacion.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+      chk.addEventListener('change', () => {
+        const i = Number(chk.dataset.indice);
+        elementosAImportar[i].incluir = chk.checked;
+        chk.closest('.fila-importacion').classList.toggle('desactivada', !chk.checked);
+        actualizarSubtituloImportacion();
+      });
+    });
+  }
+
+  function abrirPanelImportacion(){
+    pintarListaImportacion();
+    actualizarSubtituloImportacion();
+    panelImportacion.classList.add('activo');
+    panelImportacion.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function cerrarPanelImportacion(){
+    panelImportacion.classList.remove('activo');
+    elementosAImportar = [];
+  }
+
+  btnSelTodosImport.addEventListener('click', () => {
+    elementosAImportar.forEach(e => e.incluir = true);
+    pintarListaImportacion();
+    actualizarSubtituloImportacion();
+  });
+  btnSelNingunoImport.addEventListener('click', () => {
+    elementosAImportar.forEach(e => e.incluir = false);
+    pintarListaImportacion();
+    actualizarSubtituloImportacion();
+  });
+  btnSelNuevosImport.addEventListener('click', () => {
+    elementosAImportar.forEach(e => e.incluir = !e.existente);
+    pintarListaImportacion();
+    actualizarSubtituloImportacion();
+  });
+  btnSelExistentesImport.addEventListener('click', () => {
+    elementosAImportar.forEach(e => e.incluir = Boolean(e.existente));
+    pintarListaImportacion();
+    actualizarSubtituloImportacion();
+  });
+
+  btnCancelarImportacion.addEventListener('click', () => {
+    cerrarPanelImportacion();
+  });
+
+  btnConfirmarImportacion.addEventListener('click', async () => {
+    const seleccionados = elementosAImportar.filter(e => e.incluir);
+    if(seleccionados.length === 0){
+      mostrarToast('No has seleccionado ningún elemento');
+      return;
+    }
+    btnConfirmarImportacion.disabled = true;
+    try{
+      let nSobrescribir = 0;
+      let nNuevos = 0;
+      for(const el of seleccionados){
+        if(el.existente){
+          await actualizarZapato({ ...el.datos, id: el.existente.id });
+          nSobrescribir++;
+        }else{
+          await agregarZapato(el.datos);
+          nNuevos++;
+        }
+      }
+      mostrarToast(`${nSobrescribir} sobrescrito(s) · ${nNuevos} añadido(s) en Armario ${armarioActivo}`);
+      cerrarPanelImportacion();
+      await cargarYRenderizar();
+    }catch(err){
+      console.error(err);
+      mostrarToast('No se pudieron aplicar todos los cambios');
+    }finally{
+      btnConfirmarImportacion.disabled = false;
+    }
+  });
+
+  pintarPaletaColores();
+  pintarTagsActuales();
+  pintarSugerenciasTags();
+  pintarPaletaColoresMasivo();
+  pintarTagsMasivo();
+
+  abrirDB().then(async _db => {
+    db = _db;
+    await sincronizarDesdeServidor();
+    cargarYRenderizar();
+  }).catch(err => {
+    console.error(err);
+    mostrarToast('No se pudo abrir la base de datos local');
+  });
+})();
+</script>
+
+</body>
+</html>
