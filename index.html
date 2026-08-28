@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zapateiro</title>
+<title>Armario</title>
 
 <!-- PWA Manifest & iOS Meta Tags -->
 <link rel="manifest" href="manifest.json">
@@ -890,11 +890,11 @@
   <div class="cabecera-grid">
     <div></div>
     <div class="cabecera-centro">
-      <h1 id="titulo-armario">Zapateiro de Xaime</h1>
+      <h1 id="titulo-armario">Armario de Marta</h1>
       <div class="selector-armario">
         <div class="toggle-contenedor">
-          <button type="button" class="btn-armario activo" id="btn-armario-1">Xaime</button>
-          <button type="button" class="btn-armario" id="btn-armario-2">Saleta</button>
+          <button type="button" class="btn-armario activo" id="btn-armario-1">Zapatos</button>
+          <button type="button" class="btn-armario" id="btn-armario-2">Bolsos</button>
         </div>
       </div>
     </div>
@@ -1312,7 +1312,7 @@
     armarioActivo = num;
     btnArmario1.classList.toggle('activo', num === 1);
     btnArmario2.classList.toggle('activo', num === 2);
-    tituloArmario.textContent = num === 1 ? 'Zapateiro de Xaime' : 'Zapateiro de Saleta';
+    tituloArmario.textContent = num === 1 ? 'Zapatos' : 'Bolsos';
 
     entrarModoAlta();
     panelAlta.classList.remove('activo');
@@ -1322,7 +1322,7 @@
     seleccionados.clear();
     actualizarBarraSeleccion();
 
-    mostrarToast(`Cambiado a ${num === 1 ? 'Zapateiro de Xaime' : 'Zapateiro de Saleta'}`);
+    mostrarToast(`Cambiado a ${num === 1 ? 'Zapatos' : 'Bolsos'}`);
     cargarYRenderizar();
   }
 
