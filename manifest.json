@@ -1,6 +1,6 @@
 {
-  "name": "Mitata Inventario",
-  "short_name": "Mitata",
+  "name": "Armario de Marta",
+  "short_name": "Armario",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
